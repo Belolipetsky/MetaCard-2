@@ -1,9 +1,8 @@
-# keyboards/payment_keyboard.py
-from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
+from aiogram import types
 
-def payment_keyboard():
-    keyboard = InlineKeyboardMarkup()
-    keyboard.add(InlineKeyboardButton("Купить 1 карту – 89₽", callback_data="buy_1"))
-    keyboard.add(InlineKeyboardButton("Купить 5 карт – 356₽", callback_data="buy_5"))
-    keyboard.add(InlineKeyboardButton("Купить 10 карт – 699₽", callback_data="buy_10"))
+def get_payment_keyboard():
+    keyboard = types.ReplyKeyboardMarkup(resize_keyboard=True, one_time_keyboard=True)
+    keyboard.add("Купить 1 карту – 89₽")
+    keyboard.add("Купить 5 карт – 356₽ (Экономия 20%)")
+    keyboard.add("Купить 10 карт – 699₽ (Самая выгодная цена!)")
     return keyboard
