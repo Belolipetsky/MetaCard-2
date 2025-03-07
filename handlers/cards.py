@@ -1,21 +1,27 @@
-# handlers/cards.py
 from aiogram import types, Dispatcher
-from utils.texts import CARD_INSTRUCTION, WRONG_CARD_NUMBER
+from utils.texts import CARD_INSTRUCTION_TEXT
+
+# Пример описаний карт
+CARD_DESCRIPTIONS = {
+    "1": "🔮 Описание карты 1: Твои скрытые возможности скоро проявятся.",
+    "2": "🔮 Описание карты 2: Время для перемен настало.",
+    "3": "🔮 Описание карты 3: Новые перспективы уже рядом."
+}
+
+async def draw_card_command(message: types.Message):
+    # Здесь можно добавить проверку баланса попыток из базы
+    await message.answer(CARD_INSTRUCTION_TEXT)
+
+async def card_number_handler(message: types.Message):
+    card_number = message.text.strip()
+    if card_number in CARD_DESCRIPTIONS:
+        await message.answer(CARD_DESCRIPTIONS[card_number])
+    else:
+        await message.answer(
+            "❌ Такого номера нет, выбери карту в канале и попробуй снова.\n"
+            "Повтори попытку, перейдя в канал: https://t.me/+Io5-yW5dgyEyNjhi"
+        )
 
 def register_handlers(dp: Dispatcher):
-    dp.register_message_handler(cmd_draw_card, lambda message: message.text == "🔮 Вытянуть карту", state="*")
-    dp.register_message_handler(process_card_number, lambda message: message.text.isdigit(), state="*")
-
-async def cmd_draw_card(message: types.Message):
-    # Инструкция для выбора карты
-    await message.answer(CARD_INSTRUCTION)
-    # В реальной реализации можно перевести пользователя в состояние ожидания ввода номера карты
-
-async def process_card_number(message: types.Message):
-    card_number = message.text.strip()
-    if not card_number.isdigit():
-        await message.answer(WRONG_CARD_NUMBER)
-        return
-    # Здесь можно получить описание карты из списка или БД
-    card_description = f"🔮 Описание карты {card_number}: Здесь будет текст описания выбранной карты."
-    await message.answer(card_description)
+    dp.register_message_handler(draw_card_command, text="🔮 Вытянуть карту", state="*")
+    dp.register_message_handler(card_number_handler, lambda message: message.text.isdigit(), state="*")
