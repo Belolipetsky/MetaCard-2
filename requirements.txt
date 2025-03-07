@@ -1,4 +1,4 @@
-aiogram==2.25.1
+aiogram==3.0.0b6
 python-dotenv==0.21.0
 # gspread==<версия>  # Логирование (Google Sheets) – пока не используется для MVP
 
