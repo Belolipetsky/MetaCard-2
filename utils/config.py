@@ -1,8 +1,11 @@
-# utils/config.py
 import os
 from dotenv import load_dotenv
 
 load_dotenv()
 
-TOKEN = os.getenv("TOKEN")
-ADMIN_ID = os.getenv("ADMIN_ID")
+API_TOKEN = os.getenv("API_TOKEN")
+ADMIN_ID = os.getenv("ADMIN_ID")  # Задайте свой Telegram ID здесь
+
+# Дополнительные конфигурационные параметры можно добавить сюда
+
+
