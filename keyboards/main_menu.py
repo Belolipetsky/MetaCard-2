@@ -1,9 +1,6 @@
-# keyboards/main_menu.py
-from aiogram.types import ReplyKeyboardMarkup, KeyboardButton
+from aiogram import types
 
-def main_menu():
-    keyboard = ReplyKeyboardMarkup(resize_keyboard=True)
-    button_card = KeyboardButton("🔮 Вытянуть карту")
-    button_session = KeyboardButton("🎓 Записаться на сессию")
-    keyboard.add(button_card, button_session)
+def get_main_menu_keyboard():
+    keyboard = types.ReplyKeyboardMarkup(resize_keyboard=True)
+    keyboard.add("🔮 Вытянуть карту", "🎓 Записаться на сессию")
     return keyboard
