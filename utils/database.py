@@ -1,15 +1,11 @@
-# utils/database.py
-import gspread
-from oauth2client.service_account import ServiceAccountCredentials
+# Пока интеграция с Google Sheets не требуется для MVP,
+# здесь реализованы заглушки для функций логирования.
 
-def get_sheet():
-    scope = ['https://spreadsheets.google.com/feeds', 'https://www.googleapis.com/auth/drive']
-    creds = ServiceAccountCredentials.from_json_keyfile_name('credentials.json', scope)
-    client = gspread.authorize(creds)
-    # Открываем Google Таблицу по названию (создайте её заранее)
-    sheet = client.open("MetacardBotUsers").sheet1
-    return sheet
+def save_user(user_id, username, name, phone):
+    # Здесь должен быть код для сохранения пользователя в Google Sheets.
+    # Пока логгирование отключено для MVP.
+    print(f"[DB] User saved: {user_id}, {username}, {name}, {phone}")
 
-def add_user(user_id, username, name, phone, date_reg):
-    sheet = get_sheet()
-    sheet.append_row([user_id, username, name, phone, "0", date_reg, ""])
+def update_user_attempts(user_id, attempts):
+    # Здесь должен быть код для обновления баланса попыток пользователя.
+    print(f"[DB] Updated attempts for user {user_id}: {attempts}")
