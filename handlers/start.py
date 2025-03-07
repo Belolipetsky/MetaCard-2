@@ -1,41 +1,37 @@
-# handlers/start.py
 from aiogram import types, Dispatcher
-from aiogram.dispatcher import FSMContext
-from aiogram.dispatcher.filters.state import State, StatesGroup
-from utils.texts import START_MESSAGE, ASK_NAME_MESSAGE
-from keyboards.main_menu import main_menu
+from utils.texts import WELCOME_MESSAGE, MAIN_MENU_TEXT
+from utils.database import add_user
+from datetime import datetime
+from utils.config import ADMIN_ID
+from keyboards.main_menu import get_main_menu_keyboard
 
-# Состояния для авторизации
-class StartStates(StatesGroup):
-    waiting_for_phone = State()
-    waiting_for_name = State()
+async def start_command(message: types.Message):
+    # Клавиатура для запроса номера телефона
+    markup = types.ReplyKeyboardMarkup(resize_keyboard=True, one_time_keyboard=True)
+    button_phone = types.KeyboardButton("📱 Отправить номер", request_contact=True)
+    markup.add(button_phone)
+    await message.answer(WELCOME_MESSAGE, reply_markup=markup)
 
-def register_handlers(dp: Dispatcher):
-    dp.register_message_handler(cmd_start, commands=["start"], state="*")
-    dp.register_message_handler(process_contact, content_types=types.ContentType.CONTACT, state=StartStates.waiting_for_phone)
-    dp.register_message_handler(process_name, state=StartStates.waiting_for_name)
-
-async def cmd_start(message: types.Message):
-    # Отправляем приветственное сообщение с кнопкой для отправки номера
-    phone_keyboard = types.ReplyKeyboardMarkup(resize_keyboard=True, one_time_keyboard=True)
-    phone_button = types.KeyboardButton("📱 Отправить номер", request_contact=True)
-    phone_keyboard.add(phone_button)
-    await message.answer(START_MESSAGE, reply_markup=phone_keyboard)
-    await StartStates.waiting_for_phone.set()
-
-async def process_contact(message: types.Message, state: FSMContext):
+async def contact_handler(message: types.Message):
     if message.contact:
         phone = message.contact.phone_number
-        await state.update_data(phone=phone)
-        await message.answer(ASK_NAME_MESSAGE)
-        await StartStates.waiting_for_name.set()
+        await message.answer("✨ Отлично! Теперь скажи, как тебя зовут?", reply_markup=types.ReplyKeyboardRemove())
+        # Сохранение номера можно реализовать через FSM или напрямую в базе
     else:
-        await message.answer("Пожалуйста, отправьте номер телефона через кнопку ниже.")
+        await message.answer("Пожалуйста, отправь свой номер, используя кнопку ниже.")
 
-async def process_name(message: types.Message, state: FSMContext):
+async def name_handler(message: types.Message):
     name = message.text.strip()
-    data = await state.get_data()
-    phone = data.get("phone")
-    # Здесь можно сохранить данные пользователя в БД (например, через utils/database.py)
-    await message.answer(f"Спасибо, {name}! Теперь всё готово!", reply_markup=main_menu())
-    await state.finish()
+    user_id = message.from_user.id
+    username = message.from_user.username or ""
+    phone = "unknown"  # Здесь необходимо получить сохранённый ранее номер телефона
+    registration_date = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    add_user(user_id, username, name, phone, registration_date)
+    # Отправка главного меню
+    await message.answer(MAIN_MENU_TEXT.format(name=name), reply_markup=get_main_menu_keyboard())
+
+def register_handlers(dp: Dispatcher):
+    dp.register_message_handler(start_command, commands="start", state="*")
+    dp.register_message_handler(contact_handler, content_types=types.ContentType.CONTACT, state="*")
+    # Обработка ввода имени (при условии, что это не команда и не другое сообщение)
+    dp.register_message_handler(name_handler, lambda message: message.text and not message.text.startswith("/"), state="*")
