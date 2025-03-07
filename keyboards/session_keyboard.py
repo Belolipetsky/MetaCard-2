@@ -1,8 +1,7 @@
-# keyboards/session_keyboard.py
-from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
+from aiogram import types
 
-def session_keyboard():
-    keyboard = InlineKeyboardMarkup()
-    keyboard.add(InlineKeyboardButton("🎓 Записаться на личную сессию", callback_data="session_signup"))
-    keyboard.add(InlineKeyboardButton("🔄 Подумать позже", callback_data="session_later"))
+def get_session_keyboard():
+    keyboard = types.ReplyKeyboardMarkup(resize_keyboard=True, one_time_keyboard=True)
+    keyboard.add("🎓 Записаться на личную сессию")
+    keyboard.add("🔄 Подумать позже")
     return keyboard
