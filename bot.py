@@ -1,30 +1,22 @@
 import logging
-import asyncio
-from aiogram import Bot, Dispatcher
-from aiogram.contrib.fsm_storage.memory import MemoryStorage
-from utils.config import API_TOKEN, ADMIN_ID
-import handlers.start as start_handler
-import handlers.cards as cards_handler
-import handlers.payment as payment_handler
-import handlers.session as session_handler
-import handlers.admin as admin_handler
+from aiogram import Bot, Dispatcher, executor
+from utils import config
+from handlers import start, cards, session
+# from handlers import payment, admin  # Пока не используются
 
 logging.basicConfig(level=logging.INFO)
 
-bot = Bot(token=API_TOKEN)
-dp = Dispatcher(bot, storage=MemoryStorage())
+bot = Bot(token=config.BOT_TOKEN)
+dp = Dispatcher(bot)
 
-def register_handlers(dp):
-    start_handler.register_handlers(dp)
-    cards_handler.register_handlers(dp)
-    payment_handler.register_handlers(dp)
-    session_handler.register_handlers(dp)
-    admin_handler.register_handlers(dp)
+def register_all_handlers(dp):
+    start.register_start_handlers(dp)
+    cards.register_cards_handlers(dp)
+    session.register_session_handlers(dp)
+    # payment.register_payment_handlers(dp)
+    # admin.register_admin_handlers(dp)
 
-async def main():
-    register_handlers(dp)
-    await dp.start_polling()
+register_all_handlers(dp)
 
-if __name__ == '__main__':
-    asyncio.run(main())
-
+if __name__ == "__main__":
+    executor.start_polling(dp, skip_updates=True)
